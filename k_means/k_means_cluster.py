@@ -1,6 +1,6 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 
-""" 
+"""
     Skeleton code for k-means clustering mini-project.
 """
 
@@ -12,7 +12,10 @@ import numpy
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("../tools/")
+
+from sklearn.cluster import KMeans
 from feature_format import featureFormat, targetFeatureSplit
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -40,14 +43,15 @@ def Draw(pred, features, poi, mark_poi=False, name="image.png", f1_name="feature
 
 ### load in the dict of dicts containing all the data on each person in the dataset
 data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r") )
-### there's an outlier--remove it! 
+### there's an outlier--remove it!
 data_dict.pop("TOTAL", 0)
 
 
-### the input features we want to use 
-### can be any key in the person-level dictionary (salary, director_fees, etc.) 
+### the input features we want to use
+### can be any key in the person-level dictionary (salary, director_fees, etc.)
 feature_1 = "salary"
 feature_2 = "exercised_stock_options"
+feature_3 = "total_payments"
 poi  = "poi"
 features_list = [poi, feature_1, feature_2]
 data = featureFormat(data_dict, features_list )
@@ -55,7 +59,7 @@ poi, finance_features = targetFeatureSplit( data )
 
 
 ### in the "clustering with 3 features" part of the mini-project,
-### you'll want to change this line to 
+### you'll want to change this line to
 ### for f1, f2, _ in finance_features:
 ### (as it's currently written, the line below assumes 2 features)
 for f1, f2 in finance_features:
@@ -65,8 +69,19 @@ plt.show()
 ### cluster here; create predictions of the cluster labels
 ### for the data and store them to a list called pred
 
+scaler = MinMaxScaler()
+finance_features = scaler.fit_transform(finance_features)
 
+model = KMeans(n_clusters=2).fit(finance_features)
+pred = model.predict(finance_features)
 
+## Calculating a min an max of stock
+# print min(b for (a,b,c) in finance_features if b!=0)
+# print max(b for (a,b,c) in finance_features)
+
+# ## Calculating a min an max of salary
+# print min(a for (a,b,c) in finance_features if a!=0)
+# print max(a for (a,b,c) in finance_features)
 
 ### rename the "name" parameter when you change the number of features
 ### so that the figure gets saved to a different file
